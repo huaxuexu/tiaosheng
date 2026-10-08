@@ -1,0 +1,6 @@
+{
+  "name": "pe-exam-timer",
+  "version": "1.0.0",
+  "description": "中考体育 AI 骨骼关键点动作计数（当前主链路走 VisionKit 端侧关键点，无 npm 依赖）",
+  "dependencies": {}
+}

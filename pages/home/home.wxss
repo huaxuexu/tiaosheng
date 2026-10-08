@@ -1,0 +1,257 @@
+/* pages/home/home.wxss —— 首页
+   对齐 docs/档C全应用视觉系统_可交互原型.html 的 pgHome()。
+   原型按 375px 宽出图，小程序 750rpx，故原型 px 值 ×2 = rpx。 */
+
+.home {
+  min-height: 100vh;
+  background: var(--page);
+  padding-bottom: 180rpx;   /* 让开自定义 tabBar */
+  box-sizing: border-box;
+}
+
+/* ============ 运动项目卡（写实照片） ============ */
+.sportrow {
+  display: flex;
+  gap: 20rpx;
+  padding: 0 28rpx 24rpx;
+}
+.sportcard {
+  position: relative;
+  flex: 1;
+  height: 236rpx;
+  border-radius: 32rpx;
+  overflow: hidden;
+  background-color: #1D9E75;
+  /* 未选中：压暗 + 去色；必须用等长恒等函数才能平滑插值，勿写 none */
+  filter: grayscale(.95) brightness(.75);
+  transition: box-shadow .2s ease, filter .22s ease;
+}
+.sportcard.on {
+  box-shadow: inset 0 0 0 6rpx #fff, 0 12rpx 36rpx rgba(31, 41, 55, .20);
+  filter: grayscale(0) brightness(1);
+}
+.sportcard-hover { transform: scale(.985); }
+
+.sc-img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+/* 底部压暗渐变，保证白字可读 */
+.sc-scrim {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to top,
+    rgba(10, 13, 18, .66) 0%,
+    rgba(10, 13, 18, .22) 44%,
+    rgba(10, 13, 18, 0) 72%);
+}
+.sc-name {
+  position: absolute;
+  left: 26rpx;
+  bottom: 24rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 1rpx;
+  text-shadow: 0 2rpx 6rpx rgba(0, 0, 0, .45);
+}
+
+/* ============ 主训练卡片（纯品牌橙） ============ */
+.main-card {
+  margin: 0 28rpx;
+  background: var(--brand);
+  border-radius: 36rpx;
+  padding: 24rpx 24rpx 36rpx;
+}
+
+/* 模式胶囊：定时 / 定数 / 自由 */
+.seg {
+  display: flex;
+  gap: 4rpx;
+  background: rgba(255, 255, 255, .22);
+  border-radius: 999rpx;
+  padding: 6rpx;
+}
+.seg-item {
+  flex: 1;
+  text-align: center;
+  font-size: 25rpx;
+  padding: 14rpx 0;
+  border-radius: 999rpx;
+  /* 必须显式透明：app.wxss 的通用 .seg-item 是白底，不覆盖会「白字白底」看不见 */
+  background: transparent;
+  color: #fff;
+}
+.seg-item.on {
+  background: #fff;
+  color: var(--brand);
+  font-weight: 600;
+}
+
+/* 参数行 */
+.value-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 44rpx 16rpx 36rpx;
+}
+.value-row.free {
+  justify-content: center;
+}
+.rbtn {
+  flex: none;
+  width: 64rpx;
+  height: 64rpx;
+  line-height: 62rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .25);
+  color: #fff;
+  font-size: 40rpx;
+}
+.rbtn-hover { opacity: .7; }
+.big-value {
+  flex: 1;
+  text-align: center;
+  font-size: 68rpx;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 1rpx;
+  font-variant-numeric: tabular-nums;
+}
+.big-value .unit {
+  font-size: 28rpx;
+  font-weight: 400;
+  color: rgba(255, 255, 255, .85);
+  margin-left: 8rpx;
+}
+.free-text {
+  font-size: 52rpx;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
+}
+
+/* 分组训练 / 休息：当前模式下的开关 + 参数 */
+.group-box {
+  margin: 28rpx 4rpx 0;
+  background: rgba(255, 255, 255, .16);
+  border-radius: 24rpx;
+  padding: 8rpx 20rpx 20rpx;
+}
+.group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18rpx 4rpx;
+}
+.group-head-hover { opacity: .8; }
+.group-title {
+  font-size: 27rpx;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: .5rpx;
+}
+/* 开关（纯 CSS） */
+.switch {
+  position: relative;
+  width: 92rpx;
+  height: 50rpx;
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, .35);
+  transition: background .2s ease;
+  flex: none;
+}
+.switch.on { background: #fff; }
+.switch .knob {
+  position: absolute;
+  top: 5rpx;
+  left: 5rpx;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2rpx 6rpx rgba(0, 0, 0, .25);
+  transition: transform .2s ease;
+}
+.switch.on .knob { background: var(--brand); transform: translateX(42rpx); }
+
+/* 分组参数步进行 */
+.gparam {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14rpx 4rpx;
+  border-top: 2rpx solid rgba(255, 255, 255, .18);
+}
+.gk {
+  font-size: 25rpx;
+  color: #fff;
+}
+.gops {
+  display: flex;
+  align-items: center;
+}
+.gsbtn {
+  width: 56rpx;
+  height: 56rpx;
+  line-height: 54rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .28);
+  color: #fff;
+  font-size: 38rpx;
+}
+.gsbtn-hover { opacity: .7; }
+.gv {
+  min-width: 120rpx;
+  text-align: center;
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+  margin: 0 16rpx;
+}
+
+/* 开始训练大圆按钮 */
+.start-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 36rpx;
+}
+.start-circle {
+  width: 176rpx;
+  height: 176rpx;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12rpx 36rpx rgba(160, 40, 10, .18);
+}
+.start-circle-hover { transform: scale(.97); }
+/* 播放三角（纯 CSS，免图片） */
+.play-glyph {
+  width: 0;
+  height: 0;
+  border-left: 28rpx solid var(--brand);
+  border-top: 16rpx solid transparent;
+  border-bottom: 16rpx solid transparent;
+  margin-left: 8rpx;
+}
+.start-text {
+  font-size: 24rpx;
+  color: var(--brand);
+  font-weight: 600;
+  margin-top: 12rpx;
+}
+
+/* ============ （分组参数抽屉已改为首页内联开关，原 .group-overlay 样式废弃） ============ */

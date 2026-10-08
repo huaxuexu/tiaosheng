@@ -1,0 +1,66 @@
+<!-- pages/training/training.wxml —— 我的训练 -->
+<view class="training">
+  <!-- 品牌头（自带状态栏留白） -->
+  <view class="t-hero" style="padding-top:{{statusBarH + 2}}px">
+    <view class="back-row" bindtap="navBack" hover-class="back-hover">
+      <text class="back-glyph">‹</text>
+      <text class="back-text">返回</text>
+    </view>
+    <view class="t-title">我的训练</view>
+    <view class="t-sub">每一次坚持，都算数</view>
+  </view>
+
+  <!-- 统计卡（上浮压住品牌头） -->
+  <view class="card t-stats">
+    <view class="t-stat">
+      <view class="t-num">{{stat.count}}</view>
+      <view class="t-lab">累计个数</view>
+    </view>
+    <view class="t-stat">
+      <view class="t-num">{{stat.sessions}}</view>
+      <view class="t-lab">训练次数</view>
+    </view>
+    <view class="t-stat">
+      <view class="t-num">{{stat.streak}}</view>
+      <view class="t-lab">连续天数</view>
+    </view>
+    <view class="t-stat">
+      <view class="t-num">{{stat.durationText}}</view>
+      <view class="t-lab">总时长</view>
+    </view>
+  </view>
+
+  <!-- 运动筛选 -->
+  <view class="segwrap">
+    <view class="seg">
+      <view
+        wx:for="{{sports}}"
+        wx:key="key"
+        class="seg-item {{sport === item.key ? 'on' : ''}}"
+        data-key="{{item.key}}"
+        bindtap="switchSport"
+        hover-class="seg-item-hover"
+      >{{item.name}}</view>
+    </view>
+  </view>
+
+  <!-- 记录时间轴 -->
+  <view wx:if="{{!empty}}" class="tl-list">
+    <view wx:for="{{list}}" wx:key="id" class="tl">
+      <view class="rail"><view class="dot {{index === 0 ? '' : 'faint'}}"></view></view>
+      <view class="card tl-card">
+        <view class="tl-top">
+          <text class="sec">{{item.sportName}}</text>
+          <text class="num tl-count">{{item.count}} 个</text>
+        </view>
+        <view class="hint tl-sub">{{item.date}} · 用时 {{item.duration}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空态 -->
+  <view wx:else class="empty">
+    <view class="empty-text">还没有训练记录</view>
+    <view class="empty-btn" bindtap="goTrain" hover-class="btn-hover">去训练</view>
+  </view>
+</view>

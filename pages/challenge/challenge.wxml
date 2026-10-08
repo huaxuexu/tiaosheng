@@ -1,0 +1,65 @@
+<!-- pages/challenge/challenge.wxml —— 训练挑战 -->
+<view class="challenge-page" style="padding-top:{{statusBarH}}px">
+  <!-- 页首：标题 + 完成度圆牌（右侧预留胶囊宽度）。
+       未建立档案时圆牌换成锁形，不展示 0% —— 0% 会被读成「一个都没完成」。 -->
+  <view class="head">
+    <view class="head-left">
+      <view class="ph">训练挑战</view>
+      <view class="psub hint">{{headSub}}</view>
+    </view>
+    <view class="head-right" style="padding-right:{{capsuleRpx}}rpx">
+      <view class="pct-badge {{isLogin ? '' : 'locked'}}">
+        <text wx:if="{{isLogin}}">{{pct}}%</text>
+        <ui-icon wx:else name="lock" size="40" color="#9AA0A6" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 未建立档案：锁定预览引导 -->
+  <view wx:if="{{!isLogin}}" class="empty-hint">
+    建立训练档案后，这里会记录每个挑战的进度
+  </view>
+  <!-- 无记录引导 -->
+  <view wx:elif="{{!hasRecord}}" class="empty-hint">
+    还没有训练记录，去跳一组就能解锁第一个挑战
+  </view>
+
+  <!-- 挑战卡片列表。未登录时保留名字/图标/描述，只把进度位换成锁 ——
+       让人看到「有什么可拿」，而不是一片空白。 -->
+  <view class="ch-list">
+    <view
+      wx:for="{{challenges}}"
+      wx:key="id"
+      class="card ch-card {{isLogin && item.done ? 'done' : ''}} {{isLogin ? '' : 'locked'}}"
+      hover-class="ch-card-hover"
+    >
+      <view class="ch-chip {{isLogin && item.done ? 'done' : ''}} {{isLogin ? '' : 'locked'}}">
+        <ui-icon name="{{item.icon}}" size="40" color="{{isLogin && item.done ? '#ffffff' : (isLogin ? '#FF4E2A' : '#9AA0A6')}}" />
+      </view>
+      <view class="ch-body">
+        <view class="ch-top">
+          <text class="sec {{isLogin && item.done ? 'on-dark' : ''}}">{{item.title}}</text>
+          <text wx:if="{{isLogin && item.done}}" class="done-tag">已完成</text>
+        </view>
+        <view class="ch-desc {{isLogin && item.done ? 'on-dark-soft' : 'hint'}}">{{item.desc}}</view>
+
+        <!-- 未登录：锁定提示（替代进度条） -->
+        <view wx:if="{{!isLogin}}" class="ch-lock">
+          <ui-icon name="lock" size="24" color="#9AA0A6" />
+          <text class="ch-lock-t">建立档案后解锁</text>
+        </view>
+
+        <view wx:elif="{{!item.done}}" class="ch-progress">
+          <view class="pbar ch-pbar">
+            <view class="pbar-fill" style="width:{{item.pct}}%"></view>
+          </view>
+          <text class="muted ch-num">{{item.cur}}/{{item.target}} {{item.unit}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 去训练 / 建立档案 -->
+  <view wx:if="{{isLogin}}" class="btn btn-solid go-train" bindtap="goTrain" hover-class="btn-hover">去训练</view>
+  <view wx:else class="btn btn-solid go-train" bindtap="goProfile" hover-class="btn-hover">建立训练档案</view>
+</view>

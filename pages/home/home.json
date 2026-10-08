@@ -1,0 +1,7 @@
+{
+  "navigationStyle": "custom",
+  "disableScroll": false,
+  "usingComponents": {
+    "ui-icon": "/components/icon/icon"
+  }
+}

@@ -1,0 +1,139 @@
+/* pages/profile/profile.wxss —— 我的：成长会员中心（对齐原型 pgProfile / pgLogin）
+   公共件（.card/.sec/.muted/.hint/.num/.rowlink/.pbar/... ）在 app.wxss。 */
+
+.profile {
+  min-height: 100vh;
+  background: var(--page);
+  padding-bottom: 180rpx;
+  box-sizing: border-box;
+}
+
+/* ===== 未登录：登录引导 ===== */
+.login-hero {
+  background: var(--brand);
+  padding-left: 48rpx;
+  padding-right: 48rpx;
+  padding-bottom: 104rpx;
+  text-align: center;
+}
+.login-logo {
+  width: 144rpx;
+  height: 144rpx;
+  border-radius: 44rpx;
+  background: rgba(255, 255, 255, 0.25);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login-title { font-size: 36rpx; font-weight: 600; color: #fff; margin-top: 36rpx; }
+.login-sub {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 16rpx;
+  line-height: 1.6;
+}
+.login-body { padding: 80rpx 48rpx 0; }
+.login-btn { background: #fff; color: var(--brand); border: 2rpx solid var(--brand); }
+/* 删除规则必须对用户明示（缓冲式方案成立的前提），所以放在登录按钮正下方 */
+.login-tip {
+  font-size: 21rpx;
+  color: var(--ink3);
+  line-height: 1.7;
+  margin-top: 22rpx;
+  text-align: center;
+}
+
+.agree-row { display: flex; gap: 18rpx; margin-top: 36rpx; }
+.agree-check {
+  width: 34rpx;
+  height: 34rpx;
+  border-radius: 50%;
+  background: #E4E6E8;
+  flex: none;
+  margin-top: 2rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.agree-check.on { background: var(--brand); }
+.agree-text { font-size: 23rpx; color: var(--ink2); line-height: 1.7; }
+.agree-link { color: var(--brand); }
+
+/* ===== 已登录：会员中心 ===== */
+/* 品牌头。原来 padding-bottom 留 84rpx 是为了让下面那张「上浮数据卡」压上来；
+   数据卡已移除，这里收回到 40rpx，否则品牌头底部会空一大块。 */
+.m-header {
+  background: var(--brand);
+  padding-left: 32rpx;
+  padding-right: 32rpx;
+  padding-bottom: 40rpx;
+}
+.m-user { display: flex; align-items: center; gap: 24rpx; }
+/* 微信 button 自带 184×58px 默认尺寸，class 覆盖不了 → 外套定尺裁切容器 + !important */
+.avatar-wrap {
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #fff;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.avatar-btn {
+  width: 112rpx !important;
+  height: 112rpx !important;
+  min-width: 112rpx !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 50%;
+  background: #fff;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 28rpx;
+}
+.avatar { width: 112rpx; height: 112rpx; }
+.avatar-fallback { font-size: 28rpx; font-weight: 600; color: var(--brand); }
+
+.m-user-meta { flex: 1; min-width: 0; }
+.nickname-input { font-size: 32rpx; font-weight: 600; color: #fff; height: 44rpx; }
+.nick-ph { color: rgba(255, 255, 255, 0.7); }
+.m-user-sub { display: flex; align-items: center; gap: 16rpx; margin-top: 12rpx; }
+.m-days { font-size: 21rpx; color: rgba(255, 255, 255, 0.85); }
+
+/* 等级徽标（.tier-badge）与成长进度区（.m-grow / .m-grow-text / .m-grow-bar）
+   已随 WXML 一并移除（2026-09-16）：等级由本地累计个数算出、不影响任何功能；
+   而进度条的唯一说明文字就是那行「再训练 X 个升级」，去掉文字后进度条无法自解释。
+   品牌头自此只表达「我是谁」—— 头像 / 昵称 / 已加入天数。 */
+
+/* 数据概览（.stat-row / .stat-cell / .stat-num / .stat-label）已随 WXML 一并移除：
+   累计个数 / 训练次数 / 连续天数 与「数据」页重复，且那张卡原本靠 -60rpx 上浮压住品牌头，
+   是「我的」页独有的版式（training / member 页都不用负边距），去掉后本页回到常规卡片间距。 */
+
+/* 权益预览卡（.benefit-card / .bp-head / .bp-list / .bp-chip* / .bp-name / .bp-empty）
+   已随 WXML 一并移除（2026-09-16）：它是「成长中心」页内容的复述。
+   移除后本页第一个卡片就是菜单，故 .menu 的上边距取 24rpx（原预览卡的间距）。 */
+
+/* 功能菜单 */
+.menu { margin: 24rpx 28rpx 40rpx; padding: 0; overflow: hidden; }
+.rowlink + .rowlink { border-top: 2rpx solid var(--line); }
+.mi-chip {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 12rpx;
+  background: #F5F6F7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.mi-chip.danger { background: var(--brand-bg); }
+.mi-text { flex: 1; font-size: 27rpx; }
+.logout-text { color: var(--brand); }
+.mi-value { font-size: 23rpx; }
+.menu-arrow { font-size: 28rpx; color: var(--ink4); }

@@ -1,0 +1,57 @@
+/* pages/agreement/agreement.wxss —— 协议全文（对齐原型 pgAgreement）
+   公共件（.back-row/.back-hover ）在 app.wxss。 */
+
+.agree-page {
+  min-height: 100vh;
+  background: #fff;
+  padding-left: 40rpx;
+  padding-right: 40rpx;
+  padding-bottom: 60rpx;
+  box-sizing: border-box;
+}
+
+/* 返回行（白底 → 深色字） */
+.back-glyph { font-size: 28rpx; color: var(--ink4); }
+.back-text { font-size: 25rpx; color: var(--ink2); }
+
+/* 协议切换 */
+.tabs { display: flex; gap: 16rpx; margin-top: 32rpx; }
+.tab {
+  font-size: 24rpx;
+  padding: 12rpx 26rpx;
+  border-radius: var(--r-pill);
+  background: #F2F4F6;
+  color: var(--ink2);
+}
+.tab.on { background: var(--brand); color: #fff; font-weight: 600; }
+.tab-hover { opacity: 0.85; }
+
+/* 标题 + 品牌短线 */
+.doc-title { font-size: 42rpx; font-weight: 600; margin-top: 28rpx; }
+.doc-rule {
+  width: 56rpx;
+  height: 6rpx;
+  background: var(--brand);
+  border-radius: var(--r-pill);
+  margin-top: 22rpx;
+}
+
+/* 正文 */
+.doc-intro {
+  font-size: 24rpx;
+  color: var(--ink2);
+  line-height: 1.85;
+  margin-top: 32rpx;
+}
+.h2-row { display: flex; align-items: center; gap: 16rpx; margin-top: 40rpx; }
+.h2-bar { width: 6rpx; height: 26rpx; background: var(--brand); border-radius: var(--r-pill); flex: none; }
+.h2 { font-size: 26rpx; font-weight: 600; }
+.para {
+  font-size: 24rpx;
+  color: var(--ink2);
+  line-height: 1.85;
+  margin-top: 18rpx;
+}
+.strong { color: var(--brand); font-weight: 600; }
+
+.bottom-space { height: 68rpx; }

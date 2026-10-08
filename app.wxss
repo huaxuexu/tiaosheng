@@ -1,0 +1,301 @@
+/* app.wxss —— 全局样式 + 设计令牌
+   令牌对齐 docs/档C全应用视觉系统_可交互原型.html 的 :root（原型按 375px 宽用 px，
+   小程序按 750rpx 宽，故其全部值 ×2 换成 rpx）。 */
+
+page {
+  /* 品牌色 */
+  --brand: #FF4E2A;
+  --brand2: #FF8C00;
+  --brand-light: #ff8c00;                                  /* 兼容旧引用，勿删 */
+  --brand-gradient: linear-gradient(135deg, var(--brand), var(--brand2));
+  --brand-bg: #FFE7E1;
+  --brand-bg2: #FFF4F1;
+
+  /* 文字层级 */
+  --ink: #1F2937;
+  --ink2: #6B7280;
+  --ink3: #9AA0A6;
+  --ink4: #C4C8CC;
+
+  /* 面与线 */
+  --line: #F0F0F0;
+  --page: #EBEDEE;
+  --card: #ffffff;
+  --dark: #1C1F24;
+  --silk: #2B3037;
+
+  /* 语义色 */
+  --ok: #1D9E75;
+  --ok-bg: #E7F5EF;
+
+  /* 圆角 */
+  --r-sm: 12rpx;
+  --r-md: 20rpx;
+  --r-lg: 32rpx;
+  --r-xl: 36rpx;
+  --r-pill: 999rpx;
+
+  background: var(--page);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue", Helvetica, sans-serif;
+  color: var(--ink);
+  font-size: 28rpx;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 去掉 button 默认边框 */
+button::after {
+  border: none;
+}
+
+/* ============ 全局通用件（原型公共类 · rpx 版） ============ */
+
+.card {
+  background: var(--card);
+  border-radius: var(--r-lg);
+  padding: 28rpx;
+}
+.sec { font-size: 26rpx; font-weight: 600; }
+.muted { color: var(--ink2); }
+.hint { color: var(--ink3); }
+.num { font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.rowlink {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 28rpx;
+}
+.rowlink-hover { background: #FAFAFA; }
+
+/* 页面小标题（数据 / 挑战 / 成就 / 我的 等页页首） */
+.ph { font-size: 36rpx; font-weight: 600; line-height: 1.3; }
+.psub { font-size: 24rpx; margin-top: 8rpx; }
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 0 32rpx 24rpx;
+}
+/* 页首右侧元素：预留胶囊宽度由页面 style 注入（capsuleRpx） */
+.head-right { display: flex; align-items: center; padding-top: 4rpx; }
+.head-left { flex: 1; min-width: 0; }
+
+/* ============ 页内小节标题行 / 品牌链接 / 返回行 ============ */
+.sec-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 32rpx 32rpx 22rpx;
+}
+.unlock-count { font-size: 23rpx; }
+.brand-num { color: var(--brand); font-weight: 600; }
+.brand-link { font-size: 23rpx; color: var(--brand); }
+.link-hover { opacity: 0.7; }
+
+/* 自定义导航页的返回行（字形 / 文字颜色由各页 wxss 定） */
+.back-row { display: flex; align-items: center; gap: 12rpx; }
+.back-hover { opacity: 0.7; }
+/* 橙底白药丸（会员等级 / 身份标） */
+.lv-pill {
+  display: inline-block;
+  font-size: 23rpx;
+  font-weight: 600;
+  color: var(--brand);
+  background: #fff;
+  border-radius: var(--r-pill);
+  padding: 10rpx 26rpx;
+}
+
+/* ============ 分段控件（白底药丸 / 方角选中两态） ============ */
+.segwrap { padding: 0 32rpx 20rpx; }
+.seg { display: flex; gap: 12rpx; }
+.seg-item {
+  flex: 1;
+  text-align: center;
+  font-size: 26rpx;
+  padding: 16rpx 0;
+  border-radius: var(--r-pill);
+  background: #fff;
+  color: var(--ink2);
+  transition: background 0.15s, color 0.15s;
+}
+.seg-item.on { background: var(--brand); color: #fff; font-weight: 600; }
+.seg-item-hover { opacity: 0.88; }
+/* 方角变体：选中为品牌浅底 + 品牌字 */
+.seg.sq .seg-item { border-radius: 18rpx; padding: 14rpx 0; font-size: 24rpx; }
+.seg.sq .seg-item.on { background: var(--brand-bg); color: var(--brand); font-weight: 600; }
+
+/* ============ 贴边卡片 / 指标小卡 / 网格 ============ */
+.cardwrap { margin: 0 28rpx; }
+.metric {
+  background: #F5F6F7;
+  border-radius: 22rpx;
+  padding: 20rpx 12rpx;
+  text-align: center;
+}
+.metric .v { font-size: 30rpx; font-weight: 600; font-variant-numeric: tabular-nums; }
+.metric .l { font-size: 21rpx; color: var(--ink3); margin-top: 6rpx; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16rpx; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16rpx; }
+
+/* ============ 柱状趋势图（底轴 + 均值虚线） ============ */
+.chart { position: relative; height: 240rpx; }
+.bars {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 32rpx;
+  height: 192rpx;
+  display: flex;
+  align-items: flex-end;
+  gap: 12rpx;
+}
+.chart .col { flex: 1; display: flex; justify-content: center; align-items: flex-end; height: 100%; }
+.chart .bar-fill {
+  display: block;
+  width: 100%;
+  max-width: 52rpx;
+  background: #FFD9D0;
+  border-radius: 10rpx 10rpx 0 0;
+  transition: height 0.45s cubic-bezier(0.3, 0.9, 0.35, 1), background 0.2s;
+}
+.chart .col.hi .bar-fill { background: var(--brand); }
+.avgline { position: absolute; left: 0; right: 0; border-top: 2rpx dashed var(--brand2); }
+.xlabels { position: absolute; left: 0; right: 0; bottom: 0; display: flex; gap: 12rpx; }
+.xlabels .xl { flex: 1; text-align: center; font-size: 21rpx; color: var(--ink3); }
+.xlabels .xl.hi { color: var(--brand); font-weight: 600; }
+
+/* ============ 细进度条 / 实心按钮 ============ */
+.pbar { height: 12rpx; border-radius: var(--r-pill); background: var(--line); overflow: hidden; }
+.pbar-fill { display: block; height: 100%; border-radius: var(--r-pill); background: var(--brand); }
+.btn { text-align: center; font-size: 28rpx; font-weight: 600; border-radius: var(--r-pill); padding: 24rpx 0; }
+.btn-solid { background: var(--brand); color: #fff; }
+.btn-hover { opacity: 0.92; }
+
+/* ============ 设置行 / 时间轴 ============ */
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 0;
+  border-bottom: 2rpx solid var(--line);
+}
+.stepper:last-child { border-bottom: 0; }
+.stepper .k { font-size: 26rpx; }
+.stepper .ops { display: flex; align-items: center; gap: 28rpx; }
+.stepper .ops b { font-size: 30rpx; font-weight: 600; min-width: 112rpx; text-align: center; }
+
+.tl { display: flex; gap: 22rpx; }
+.tl .rail { width: 6rpx; background: var(--brand-bg); border-radius: var(--r-pill); position: relative; flex: none; }
+.tl .rail .dot {
+  position: absolute;
+  left: -6rpx;
+  top: 14rpx;
+  width: 18rpx;
+  height: 18rpx;
+  border-radius: 50%;
+  background: var(--brand);
+}
+.tl .rail .dot.faint { background: #FFB59A; }
+
+/* ============ 首页主标题 ============ */
+.hero { padding: 4rpx 36rpx 28rpx; }
+.hero-title {
+  font-size: 48rpx;
+  font-weight: 800;
+  line-height: 1.22;
+  letter-spacing: 0.6rpx;
+  color: var(--ink);
+}
+/* 「计数器」品牌渐变字：不支持渐变裁剪时回退为品牌橙纯色 */
+.hero-title .hero-em {
+  background-image: linear-gradient(92deg, var(--brand), var(--brand2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: var(--brand);
+  -webkit-text-fill-color: transparent;
+}
+.hero-sub {
+  display: flex;
+  align-items: center;
+  font-size: 25rpx;
+  color: var(--ink2);
+  margin-top: 16rpx;
+  letter-spacing: 0.8rpx;
+}
+/* 标语前的橙色短横 */
+.hero-sub::before {
+  content: '';
+  width: 32rpx;
+  height: 6rpx;
+  border-radius: 4rpx;
+  background: linear-gradient(90deg, var(--brand), var(--brand2));
+  margin-right: 14rpx;
+  flex: none;
+}
+
+/* ============ 底部抽屉（sheet）+ 遮罩 ============
+   对齐原型 docs/档C全应用视觉系统_可交互原型.html 的 .overlay / .sheet：
+   遮罩压暗 + 底部上滑白色抽屉。原型 375px 宽，故 px ×2 = rpx。 */
+.overlay {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 900;
+  background: rgba(12, 14, 18, 0.55);
+  display: flex;
+  align-items: flex-end;
+  animation: overlayFade 0.2s ease both;
+}
+@keyframes overlayFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.sheet {
+  width: 100%;
+  background: #fff;
+  border-radius: 40rpx 40rpx 0 0;
+  padding: 36rpx 36rpx 48rpx;
+  box-sizing: border-box;
+  animation: sheetIn 0.26s cubic-bezier(0.3, 0.9, 0.35, 1) both;
+}
+@keyframes sheetIn {
+  from { transform: translateY(100%); }
+  to { transform: none; }
+}
+.sheet-handle {
+  width: 76rpx;
+  height: 8rpx;
+  border-radius: var(--r-pill);
+  background: #E4E6E8;
+  margin: 0 auto 32rpx;
+}
+.sheet-title { font-size: 30rpx; font-weight: 600; color: var(--ink); }
+.sheet-desc { font-size: 24rpx; color: var(--ink2); margin-top: 12rpx; line-height: 1.6; }
+.sheet-body { margin-top: 24rpx; }
+.sheet-start { margin-top: 36rpx; }
+.sheet-cancel { text-align: center; font-size: 25rpx; color: var(--ink3); margin-top: 24rpx; }
+/* 抽屉内圆形 +/- 按钮：白底描边（区别于橙卡上的 .rbtn），对齐原型 .rbtn */
+.sbtn {
+  width: 60rpx;
+  height: 60rpx;
+  line-height: 56rpx;
+  text-align: center;
+  border-radius: 50%;
+  border: 2rpx solid #E2E4E6;
+  background: #fff;
+  color: var(--ink2);
+  font-size: 32rpx;
+  box-sizing: border-box;
+}
+.sbtn-hover { background: #F5F6F7; }
+/* 抽屉 stepper 的数值（对应原型 .stepper .ops b） */
+.stepper .ops .val {
+  font-size: 30rpx;
+  font-weight: 600;
+  min-width: 112rpx;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}

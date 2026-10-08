@@ -1,0 +1,87 @@
+<!-- pages/profile/profile.wxml —— 我的：本机训练档案 + 账号操作 -->
+<view class="profile">
+
+  <!-- 未登录：建立档案引导。
+       2026-09-16 改文案：原文「会有时会员 / 登录解锁专属训练档案与会员权益」承诺的是
+       一个并不存在的会员体系（权益清单里没有任何真实门控）。改为直说三件事：
+       ① 这里是什么（训练档案）② 数据在哪（本机、不上传）③ 不建立档案会怎样（只看当日 + 暂存 N 天）。 -->
+  <block wx:if="{{!isLogin}}">
+    <view class="login-hero" style="padding-top:{{statusBarH + 42}}px">
+      <view class="login-logo"><ui-icon name="flame" size="80" color="#ffffff" /></view>
+      <view class="login-title">训练档案</view>
+      <view class="login-sub">记录只保存在本机，不上传服务器</view>
+      <view class="login-sub">建立档案后可查看完整历史、趋势与挑战、成就进度</view>
+    </view>
+    <view class="login-body">
+      <view class="btn login-btn" bindtap="onLogin" hover-class="btn-hover">微信一键登录 · 建立训练档案</view>
+      <view class="login-tip">未建立档案时只显示当日记录；最近 {{bufferDays}} 天会暂存在本机，建立档案后并入档案。</view>
+      <view class="agree-row" bindtap="onAgreeTap">
+        <view class="agree-check {{agreed ? 'on' : ''}}">
+          <ui-icon wx:if="{{agreed}}" name="check" size="20" color="#ffffff" />
+        </view>
+        <view class="agree-text">
+          我已阅读并同意
+          <text class="agree-link" data-type="user" catchtap="goAgreement">《用户协议》</text>
+          与
+          <text class="agree-link" data-type="privacy" catchtap="goAgreement">《隐私政策》</text>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <!-- 已登录：训练档案 -->
+  <block wx:else>
+    <!-- 品牌头：头像 / 昵称 / 会员档位 / 成长进度 -->
+    <view class="m-header" style="padding-top:{{statusBarH + 4}}px">
+      <view class="m-user">
+        <!-- 注意：微信对 <button> 有内置默认尺寸（184×58px），class 覆盖不掉，
+             所以外面套一层定尺圆形容器裁切，并给 button 加 !important 强制尺寸。 -->
+        <view class="avatar-wrap">
+          <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+            <image wx:if="{{avatarUrl}}" class="avatar" src="{{avatarUrl}}" mode="aspectFill" />
+            <view wx:else class="avatar-fallback">{{avatarChar}}</view>
+          </button>
+        </view>
+        <view class="m-user-meta">
+          <input
+            class="nickname-input"
+            type="nickname"
+            placeholder="点击设置昵称"
+            placeholder-class="nick-ph"
+            value="{{nickname}}"
+            bindinput="onNicknameInput"
+            bindblur="onNicknameBlur"
+          />
+          <view class="m-user-sub">
+            <text class="m-days">已加入 {{memberDays}} 天</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 会员等级徽标与成长进度区（「再训练 X 个升级」+ 进度条）已于 2026-09-16 移除：
+           等级由本地累计个数算出、不改变任何功能；而进度条的唯一说明文字就是那行「再训练」，
+           去掉文字后进度条无法自解释，故一并移除。
+           品牌头自此只表达「我是谁」：头像 / 昵称 / 已加入天数。 -->
+    </view>
+
+    <!-- 数据概览（累计个数 / 训练次数 / 连续天数）已移除。
+         这三项与「数据」页的 stat-row 完全同名同义，属纯重复；按「数字只在数据页」
+         的职责划分，本页不再复述。要看数据请走「数据」tab。 -->
+
+    <!-- 权益预览卡与「成长中心」「我的训练」两条菜单行已移除（2026-09-16）：
+         前三项都是别页内容的复述（权益 → 成长中心页，逐次明细 → 训练档案页）。
+         本页只保留「我是谁」与账号操作，不再承担跳转中转站的职责。
+         ⚠️ 逐次明细入口改挂在「数据」页（见 pages/data），训练页本身保留；
+         成长中心页（pages/member）目前暂无入口，等成长/会员口径定了再挂回去。 -->
+
+    <!-- 功能菜单 -->
+    <view class="card menu">
+      <view class="rowlink" bindtap="onLogout" hover-class="rowlink-hover">
+        <view class="mi-chip danger"><ui-icon name="log-out" size="30" color="#FF4E2A" /></view>
+        <text class="mi-text logout-text">退出登录</text>
+        <text class="menu-arrow">›</text>
+      </view>
+    </view>
+  </block>
+
+</view>

@@ -1,0 +1,38 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/index/index",
+    "pages/data/data",
+    "pages/challenge/challenge",
+    "pages/achievement/achievement",
+    "pages/profile/profile",
+    "pages/training/training",
+    "pages/member/member",
+    "pages/agreement/agreement"
+  ],
+  "workers": "workers",
+  "window": {
+    "navigationBarTitleText": "会有时计数器",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f8f8f8",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#9aa0a6",
+    "selectedColor": "#FF4E2A",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/home/home", "text": "运动" },
+      { "pagePath": "pages/data/data", "text": "数据" },
+      { "pagePath": "pages/challenge/challenge", "text": "挑战" },
+      { "pagePath": "pages/achievement/achievement", "text": "成就" },
+      { "pagePath": "pages/profile/profile", "text": "我的" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "__usePrivacyCheck__": true
+}

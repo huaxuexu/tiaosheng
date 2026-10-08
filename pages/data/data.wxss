@@ -1,0 +1,175 @@
+/* pages/data/data.wxss —— 运动数据统计（对齐原型 pgData）
+   公共件（.head/.card/.seg/.chart/... ）在 app.wxss，这里只写本页专有部分。 */
+
+.data-page {
+  min-height: 100vh;
+  background: var(--page);
+  padding-bottom: 180rpx;
+  box-sizing: border-box;
+}
+
+/* 页首右侧：当前月份（品牌色小字） */
+.month-tag { font-size: 24rpx; color: var(--brand); }
+
+/* ---- 主指标卡 ---- */
+.metric-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.metric-label { font-size: 23rpx; }
+
+/* 分享入口：与「运动 · 周期」同行右对齐。做成药丸而非裸图标，
+   是为了让「这里可以分享」在第一次看到时就能被读出来（裸图标常被当成装饰）。 */
+.share-btn {
+  display: flex;
+  align-items: center;
+  gap: 6rpx;
+  padding: 8rpx 18rpx;
+  border-radius: var(--r-pill);
+  background: var(--brand-bg2);
+  flex: none;
+}
+.share-btn-t { font-size: 22rpx; font-weight: 600; color: var(--brand); }
+.share-btn-hover { background: var(--brand-bg); }
+
+.metric-main { display: flex; align-items: baseline; margin-top: 14rpx; }
+.metric-num { font-size: 84rpx; line-height: 1; }
+.metric-unit { font-size: 26rpx; margin-left: 12rpx; }
+
+.delta-pill {
+  display: inline-block;
+  margin-top: 22rpx;
+  background: var(--ok-bg);
+  border-radius: var(--r-pill);
+  padding: 10rpx 22rpx;
+}
+.delta-text { font-size: 23rpx; font-weight: 600; color: var(--ink2); }
+.delta-text.up { color: var(--ok); }
+
+.stat-row {
+  display: flex;
+  margin-top: 30rpx;
+  border-top: 2rpx solid var(--line);
+  padding-top: 26rpx;
+}
+.stat-col { flex: 1; }
+.stat-v { font-size: 32rpx; }
+.stat-l { font-size: 21rpx; margin-top: 8rpx; }
+
+/* ---- 趋势卡 ---- */
+.chart-card { margin-top: 20rpx; margin-bottom: 20rpx; }
+.chart-head { display: flex; justify-content: space-between; align-items: baseline; }
+.chart-note { font-size: 21rpx; }
+.chart-card .chart { margin-top: 28rpx; }
+/* ---- 逐次明细入口（由「我的」页移入，2026-09-16） ----
+   .card 自带内边距，与 .rowlink 的内边距会叠加，故本卡 padding 归零；
+   纵向间距：上方趋势卡已有 margin-bottom 20rpx，这里只补底部。 */
+.records-entry {
+  padding: 0;
+  overflow: hidden;
+  margin-top: 0;
+  margin-bottom: 40rpx;
+}
+.re-chip {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 12rpx;
+  background: #F5F6F7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.re-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.re-sub { font-size: 21rpx; margin-top: 6rpx; }
+.re-arrow { font-size: 28rpx; color: var(--ink4); }
+
+.chart-empty {
+  text-align: center;
+  color: var(--ink3);
+  font-size: 26rpx;
+  padding: 90rpx 0;
+}
+
+/* ============ 登录门控（2026-09-16）============
+   未建立档案时：顶部提示条说明「仅显示今日 + 暂存 7 天」，趋势卡整块锁定。
+   规则明示是这一套设计能成立的前提 —— 不能只把数据藏起来。 */
+.gate-bar { margin-bottom: 20rpx; }
+.gate-top { display: flex; align-items: center; gap: 16rpx; }
+.gate-chip {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 12rpx;
+  flex: none;
+  background: var(--brand-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gate-t { font-size: 26rpx; font-weight: 600; }
+.gate-s { font-size: 22rpx; color: var(--ink3); line-height: 1.6; margin-top: 14rpx; }
+.gate-btn { margin-top: 22rpx; }
+
+/* 趋势锁定占位（替换柱状图区域） */
+.chart-lock { padding: 60rpx 0 52rpx; text-align: center; }
+.chart-lock-chip {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 26rpx;
+  margin: 0 auto;
+  background: #F5F6F7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.chart-lock-t { font-size: 26rpx; font-weight: 600; color: var(--ink2); margin-top: 22rpx; }
+.chart-lock-s { font-size: 22rpx; color: var(--ink4); margin-top: 10rpx; }
+
+/* ============ 分享预览面板（2026-09-16）============
+   抽屉底边停在自定义 tabBar 上沿：tabBar 是 position:fixed / z-index 9999 的独立组件，
+   页面内元素盖不住它（与首页参数抽屉同一处理，见 pages/home/home.wxss）。 */
+.share-overlay {
+  bottom: calc(120rpx + env(safe-area-inset-bottom));
+}
+.share-sheet { padding-top: 28rpx; }
+
+/* 预览区背景是灰的：卡片图还没生成时那一块不会闪白，
+   占位框按卡片比例撑高（319:226 ≈ 70.8%，padding-top 百分比按宽度解析），
+   避免生成完成时的高度跳动。 */
+.share-preview {
+  border-radius: 24rpx;
+  overflow: hidden;
+  background: #F5F6F7;
+}
+.share-img { width: 100%; display: block; }
+.share-img-ph {
+  position: relative;
+  width: 100%;
+  padding-top: 70.8%;
+}
+.share-img-ph-t {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  text-align: center;
+  font-size: 24rpx;
+  color: var(--ink3);
+}
+
+.share-tip {
+  text-align: center;
+  font-size: 22rpx;
+  color: var(--ink3);
+  margin-top: 22rpx;
+}
+.share-acts { display: flex; gap: 20rpx; margin-top: 26rpx; }
+/* 主次分明：分享是主动作，保存是次要动作 */
+.share-ghost { flex: 1; background: #F5F6F7; color: var(--ink2); }
+.share-main { flex: 1.25; }
+/* 分享面板内的 button 化按钮：去掉小程序原生按钮默认边框与内边距 */
+.share-acts button { margin: 0; line-height: normal; }
+.share-acts button::after { border: none; }
+.share-moment { flex: 1.25; }

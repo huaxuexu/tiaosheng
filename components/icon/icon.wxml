@@ -1,0 +1,5 @@
+<!-- components/icon/icon.wxml -->
+<view
+  class="ui-icon"
+  style="width:{{size}}rpx;height:{{size}}rpx;background-image:url('{{src}}');background-size:contain;background-repeat:no-repeat;background-position:center;"
+></view>

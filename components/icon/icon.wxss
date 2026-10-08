@@ -1,0 +1,6 @@
+/* components/icon/icon.wxss */
+.ui-icon {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1;
+}

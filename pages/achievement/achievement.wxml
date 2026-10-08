@@ -1,0 +1,49 @@
+<!-- pages/achievement/achievement.wxml —— 成就（等级 + 徽章） -->
+<view class="ach-page" style="padding-top:{{statusBarH}}px">
+  <!-- 页首：标题 + 累计跳绳 -->
+  <view class="head">
+    <view class="head-left">
+      <view class="ph">成就</view>
+      <view class="psub hint">{{headSub}}</view>
+    </view>
+  </view>
+
+  <!-- 等级卡：Lv + 等级名 + 成长进度。
+       未建立档案时整卡灰化、显示 Lv.—、隐藏进度条（进度条离开「还差多少个」就无法自解释）。 -->
+  <view class="level-card {{isLogin ? '' : 'locked'}}">
+    <view class="lv-badge">
+      <view class="lv-cap">等级</view>
+      <view class="lv-num">{{lvText}}</view>
+    </view>
+    <view class="lv-main">
+      <view class="lv-name">{{levelTitle}}</view>
+      <view class="pbar lv-bar" wx:if="{{isLogin}}">
+        <view class="pbar-fill" style="width:{{level.progress}}%"></view>
+      </view>
+      <view class="lv-hint">{{nextHint}}</view>
+    </view>
+  </view>
+
+  <!-- 未建立档案：徽章引导 -->
+  <view wx:if="{{!isLogin}}" class="empty-hint">
+    建立训练档案后，徽章会随训练自动点亮
+  </view>
+
+  <!-- 徽章标题行 -->
+  <view class="sec-row">
+    <text class="sec">徽章</text>
+    <text wx:if="{{isLogin}}" class="muted unlock-count">已解锁 <text class="brand-num">{{unlockedCount}}</text> / {{totalCount}}</text>
+    <text wx:else class="muted unlock-count">共 {{totalCount}} 个</text>
+  </view>
+
+  <!-- 徽章网格 -->
+  <view class="grid3 badge-grid">
+    <view wx:for="{{badges}}" wx:key="id" class="badge {{item.unlocked ? 'on' : ''}}">
+      <view class="badge-chip {{item.unlocked ? '' : 'off'}}">
+        <ui-icon name="{{item.icon}}" size="36" color="{{item.unlocked ? '#FF4E2A' : '#C4C8CC'}}" />
+      </view>
+      <view class="badge-name">{{item.name}}</view>
+      <view class="badge-desc">{{item.desc}}</view>
+    </view>
+  </view>
+</view>

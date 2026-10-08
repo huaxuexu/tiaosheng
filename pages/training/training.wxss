@@ -1,0 +1,57 @@
+/* pages/training/training.wxss —— 我的训练（对齐原型 pgTraining）
+   公共件（.card/.sec/.hint/.num/.seg/.tl/.rail/.dot ）在 app.wxss。 */
+
+.training {
+  min-height: 100vh;
+  background: var(--page);
+  padding-bottom: 60rpx;
+  box-sizing: border-box;
+}
+
+/* ---- 品牌头 ---- */
+.t-hero {
+  background: var(--brand);
+  padding-left: 32rpx;
+  padding-right: 32rpx;
+  padding-bottom: 80rpx;
+}
+.t-hero .back-row { margin-bottom: 16rpx; }
+.back-glyph { font-size: 28rpx; color: rgba(255, 255, 255, 0.9); }
+.back-text { font-size: 25rpx; color: rgba(255, 255, 255, 0.9); }
+.t-title { font-size: 36rpx; font-weight: 600; color: #fff; }
+.t-sub { font-size: 24rpx; color: rgba(255, 255, 255, 0.85); margin-top: 10rpx; }
+
+/* ---- 统计卡 ---- */
+.t-stats {
+  margin: -56rpx 28rpx 0;
+  padding: 28rpx 16rpx;
+  display: flex;
+}
+.t-stat { flex: 1; text-align: center; }
+.t-num { font-size: 32rpx; font-weight: 600; font-variant-numeric: tabular-nums; }
+.t-lab { font-size: 19rpx; color: var(--ink3); margin-top: 6rpx; }
+
+/* 运动筛选与统计卡拉开距离 */
+.training .segwrap { margin-top: 28rpx; }
+
+/* ---- 记录时间轴 ---- */
+.tl-list { padding: 0 28rpx 22rpx; }
+.tl { display: flex; gap: 22rpx; margin-bottom: 18rpx; }
+.tl-card { flex: 1; padding: 24rpx 26rpx; border-radius: 26rpx; }
+.tl-top { display: flex; justify-content: space-between; align-items: baseline; }
+.tl-count { font-size: 27rpx; color: var(--brand); }
+.tl-sub { font-size: 21rpx; margin-top: 12rpx; }
+
+/* ---- 空态 ---- */
+.empty { text-align: center; padding: 120rpx 0 40rpx; }
+.empty-text { font-size: 26rpx; color: var(--ink3); }
+.empty-btn {
+  display: inline-block;
+  margin-top: 28rpx;
+  padding: 16rpx 48rpx;
+  border-radius: var(--r-pill);
+  background: var(--brand);
+  color: #fff;
+  font-size: 26rpx;
+  font-weight: 600;
+}

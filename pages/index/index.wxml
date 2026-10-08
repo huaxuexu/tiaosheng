@@ -1,0 +1,175 @@
+<!-- pages/index/index.wxml —— 通用训练页（VisionKit 原生身体追踪） -->
+<!-- <canvas type="webgl"> 是原生组件，覆盖层必须用 <cover-view> -->
+<view class="container">
+  <canvas type="webgl" id="webgl" class="gl"></canvas>
+
+  <!-- 对焦触控层：覆盖取景区域，捕获手动对焦点击 -->
+  <cover-view class="focus-layer" bindtap="handleTapFocus" style="position: absolute; left: 75rpx; top: 73rpx"></cover-view>
+
+  <!-- 调试关节点浮层：按解剖部位着色（路线A，便于肉眼核对索引→关节） -->
+  <block wx:if="{{showDebug}}">
+    <cover-view wx:for="{{debugPoints}}" wx:key="idx" class="dbg-pt dbg-{{item.role}}"
+      style="left:{{item.x * 100}}%;top:{{item.y * 100}}%">{{item.idx}}</cover-view>
+  </block>
+
+  <!-- 四角 L 型取景框（出框变红） -->
+  <cover-view class="corner corner-tl {{(inFrame || groupResting) ? '' : 'out'}}">
+    <cover-view class="bar bar-h"></cover-view><cover-view class="bar bar-v"></cover-view>
+  </cover-view>
+  <cover-view class="corner corner-tr {{(inFrame || groupResting) ? '' : 'out'}}">
+    <cover-view class="bar bar-h"></cover-view><cover-view class="bar bar-v"></cover-view>
+  </cover-view>
+  <cover-view class="corner corner-bl {{(inFrame || groupResting) ? '' : 'out'}}">
+    <cover-view class="bar bar-h"></cover-view><cover-view class="bar bar-v"></cover-view>
+  </cover-view>
+  <cover-view class="corner corner-br {{(inFrame || groupResting) ? '' : 'out'}}">
+    <cover-view class="bar bar-h"></cover-view><cover-view class="bar bar-v"></cover-view>
+  </cover-view>
+
+  <!-- 出框提示：组间休息时人走开是正常的，不提示 -->
+  <cover-view wx:if="{{!inFrame && !groupResting}}" class="frame-hint-wrap">
+    <cover-view class="frame-hint">请将身体移入取景框</cover-view>
+  </cover-view>
+
+  <!-- 准备倒计时（三种模式统一 5 秒：进入页面即自动开始） -->
+  <cover-view wx:if="{{phase === 'prep'}}" class="prep-overlay">
+    <cover-view class="prep-num {{prepBeat ? 'prep-beat' : ''}}">{{prepNum > 0 ? prepNum : ''}}</cover-view>
+    <cover-view class="prep-text">{{prepNum > 0 ? '准备' : '开始'}}</cover-view>
+  </cover-view>
+
+  <!-- 训练中 HUD -->
+  <block wx:if="{{phase === 'running'}}">
+    <!-- 顶部信息行：用时(左) | 组进度(中，仅分组) | 计数(右) -->
+    <cover-view class="hud-top-row">
+      <cover-view class="hud-pill hud-pill-left">
+        <cover-view class="hud-elapsed-val">{{elapsedStr}}</cover-view>
+      </cover-view>
+      <!-- 分组模式：工作组显示「第 k / N 组」（定数为本组个数/目标），休息段变绿底显示休息倒计时 -->
+      <cover-view wx:if="{{isGroup}}" class="hud-pill hud-pill-mid {{groupResting ? 'rest' : ''}}">
+        <cover-view wx:if="{{groupResting}}" class="hud-group-val">{{groupRestStr}}</cover-view>
+        <cover-view wx:elif="{{mode === 'counted'}}" class="hud-group-val">{{groupSetCount}}/{{groupSetTarget}}</cover-view>
+        <cover-view wx:else class="hud-group-val">{{groupNo}}/{{groupSets}}</cover-view>
+        <cover-view class="hud-group-cap">{{groupResting ? '休息中' : (mode === 'counted' ? '本组' : '组')}}</cover-view>
+      </cover-view>
+      <cover-view class="hud-pill hud-pill-right {{countBeat ? 'count-beat' : ''}}">
+        <cover-view class="hud-count-val">{{counter}}</cover-view>
+      </cover-view>
+    </cover-view>
+
+    <cover-view class="status-hint">
+      <cover-view class="status-dot {{status === 'UP' ? 'up' : ''}}"></cover-view>
+      <cover-view class="status-text">{{statusText}}</cover-view>
+    </cover-view>
+
+    <!-- 操作区：暂停/继续 + 停止/结束 -->
+    <cover-view class="action-bar">
+      <cover-view class="act-item" bindtap="handlePause">
+        <cover-view class="circle circle-pause">
+          <!-- 分组模式的「时钟在走」由 groupRunning 表达（休息段 isRunning 为 false 但会话未暂停） -->
+          <cover-view wx:if="{{isRunning || groupRunning}}" class="pause-bar"></cover-view>
+          <cover-view wx:if="{{isRunning || groupRunning}}" class="pause-bar pause-bar-right"></cover-view>
+          <cover-view wx:else class="play-glyph">▶</cover-view>
+        </cover-view>
+        <cover-view class="act-label">{{(isRunning || groupRunning) ? '暂停' : '继续'}}</cover-view>
+      </cover-view>
+      <!-- 自由分组：工作段提供「结束本组」手动按钮，点它才进休息 -->
+      <cover-view wx:if="{{isGroup && mode === 'free' && groupPhase === 'work'}}" class="act-item" bindtap="groupEndWork">
+        <cover-view class="circle circle-end"><cover-view class="end-check">✓</cover-view></cover-view>
+        <cover-view class="act-label">结束本组</cover-view>
+      </cover-view>
+      <cover-view class="act-item" bindtap="handleStop">
+        <cover-view class="circle circle-stop"><cover-view class="stop-square"></cover-view></cover-view>
+        <cover-view class="act-label">{{mode === 'free' ? '结束' : '停止'}}</cover-view>
+      </cover-view>
+    </cover-view>
+  </block>
+
+  <!-- 结果摘要 -->
+  <cover-view wx:if="{{phase === 'finished'}}" class="result-overlay">
+    <cover-view class="result-card">
+      <cover-view class="result-title">训练完成</cover-view>
+      <cover-view class="result-row"><cover-view class="result-k">完成个数</cover-view><cover-view class="result-v">{{resultCount}}</cover-view></cover-view>
+      <cover-view wx:if="{{isGroup}}" class="result-row"><cover-view class="result-k">完成组数</cover-view><cover-view class="result-v">{{groupSets}} 组</cover-view></cover-view>
+      <!-- 分组模式下 elapsed 是「净训练时长」（只累计工作组，不含组间休息）。
+           标签必须说清，否则 3×60 + 2×30 的 4 分钟会话显示 03:00 会被当成丢数据。 -->
+      <cover-view class="result-row"><cover-view class="result-k">{{isGroup ? '净训练用时' : '用时'}}</cover-view><cover-view class="result-v">{{resultElapsedStr}}</cover-view></cover-view>
+      <cover-view class="result-btns">
+        <cover-view class="result-btn" bindtap="restart">再来一次</cover-view>
+        <cover-view class="result-btn result-btn-ghost" bindtap="backHome">返回首页</cover-view>
+      </cover-view>
+      <cover-view class="share-bar">
+        <cover-view class="share-divider"></cover-view>
+        <cover-view class="share-title">分享运动成果</cover-view>
+        <cover-view class="share-btns">
+          <!-- cover-view 内只允许 cover-view / cover-image / button，
+               放自定义组件(ui-icon)属未定义行为：iOS 直接不渲染，部分安卓机型会原生崩溃 -->
+          <button class="share-btn" bindtap="shareByImage">
+            <cover-view class="s-btn-inner">
+              <cover-view class="s-btn-label">分享</cover-view>
+            </cover-view>
+          </button>
+        </cover-view>
+      </cover-view>
+    </cover-view>
+  </cover-view>
+
+  <!-- 对焦反馈环 -->
+  <cover-view wx:if="{{showFocus}}" class="focus-ring" style="left:{{focusX}}px;top:{{focusY}}px;"></cover-view>
+
+  <!-- 分享卡片隐藏 canvas（位置由 inline style 固定在屏幕外，无需 class）。
+       尺寸 = 原型 shareOverlay() 卡片实测 303×244，与 _drawShareCard() 里的 2× 绘制对应。 -->
+  <canvas type="2d" id="shareCanvas" style="position:fixed;left:-9999px;top:-9999px;width:303px;height:244px;"></canvas>
+
+  <!-- 调试开关 + 重置 -->
+  <cover-view class="tool-bar">
+    <cover-view class="tool-btn" bindtap="handleReset">重置</cover-view>
+    <cover-view class="tool-btn" bindtap="toggleDebug">{{showDebug ? '关调试' : '调试'}}</cover-view>
+  </cover-view>
+
+  <!-- 调试面板（跳绳 / 垫排球 共用，按 sport 显示对应通道） -->
+  <cover-view wx:if="{{showDebug}}" class="diag-panel">
+    <cover-view class="diag-title">调试诊断（{{sport === 'volleyball' ? '垫排球' : '跳绳'}}）</cover-view>
+
+    <block wx:if="{{sport === 'volleyball'}}">
+      <cover-view class="diag-row">腕 {{dbgWrist}} 肘 {{dbgElbow}}</cover-view>
+      <cover-view class="diag-row">当前票 {{dbgVotes}}  阈值≥{{minVotes}}  腕波动std {{dbgStdW}}</cover-view>
+    </block>
+    <block wx:else>
+      <cover-view class="diag-row">髋 {{dbgHip}} 脚踝 {{dbgAnk}} 肩 {{dbgShoulder}}</cover-view>
+      <cover-view class="diag-row">膝 {{dbgKnee}} 腕 {{dbgWrist}} 腿长 {{dbgFoot}}</cover-view>
+      <cover-view class="diag-row">当前票 {{dbgVotes}}  同意 {{dbgGateAgree}}/{{dbgGateNeed}}  拒绝 {{dbgRejected}}  std {{dbgStd}}</cover-view>
+      <cover-view class="diag-row">腕动{{dbgArmSig}} 脚动{{dbgFootSig}} 加速{{dbgAccelSig}} 绳{{dbgRopeSig}}</cover-view>
+    </block>
+
+    <cover-view class="diag-row" style="color:#aaa;">VK点数 {{vkPointsLen}} 缺失 {{vkMissingIdx || '无'}}</cover-view>
+    <cover-view class="diag-row" style="color:{{mapOk === false ? '#ff6666' : '#66ff99'}};">{{mapHint}}</cover-view>
+    <cover-view class="diag-row" style="color:#9ad;">候选 {{candHint}}</cover-view>
+    <cover-view class="diag-row" style="color:#ffcc00;">加权分 {{dbgWeight}}&emsp;计数 {{counter}}</cover-view>
+
+    <cover-view class="diag-row diag-tip">某通道幅度&lt;0.05 多为索引错；点色=部位：肩蓝 髋红 膝黄 踝绿 腕紫</cover-view>
+    <cover-view class="diag-row" style="margin-top:10rpx;">最少同意信号数(含跳)</cover-view>
+    <cover-view class="sens-row">
+      <cover-view class="sens-btn {{minVotes===1?'on':''}}" data-lv="1" bindtap="onVotes">1</cover-view>
+      <cover-view class="sens-btn {{minVotes===2?'on':''}}" data-lv="2" bindtap="onVotes">2</cover-view>
+      <cover-view class="sens-btn {{minVotes===3?'on':''}}" data-lv="3" bindtap="onVotes">3</cover-view>
+      <cover-view class="sens-btn {{minVotes===4?'on':''}}" data-lv="4" bindtap="onVotes">4</cover-view>
+    </cover-view>
+    <cover-view class="diag-row">敏感度(同步窗口)</cover-view>
+    <cover-view class="sens-row">
+      <cover-view class="sens-btn {{sensitivity>=1?'on':''}}" data-lv="1" bindtap="onSens">1</cover-view>
+      <cover-view class="sens-btn {{sensitivity>=2?'on':''}}" data-lv="2" bindtap="onSens">2</cover-view>
+      <cover-view class="sens-btn {{sensitivity>=3?'on':''}}" data-lv="3" bindtap="onSens">3</cover-view>
+      <cover-view class="sens-btn {{sensitivity>=4?'on':''}}" data-lv="4" bindtap="onSens">4</cover-view>
+      <cover-view class="sens-btn {{sensitivity>=5?'on':''}}" data-lv="5" bindtap="onSens">5</cover-view>
+    </cover-view>
+  </cover-view>
+
+  <!-- 摄像头权限引导（未授权时显示，盖在 canvas 之上，避免黑屏假死） -->
+  <cover-view wx:if="{{needAuth}}" class="auth-overlay">
+    <cover-view class="auth-icon">摄</cover-view>
+    <cover-view class="auth-title">需要摄像头权限</cover-view>
+    <cover-view class="auth-desc">训练需调用摄像头实时识别动作，请在设置中允许后重试</cover-view>
+    <cover-view class="auth-btn" bindtap="retryAuth">去开启权限</cover-view>
+    <cover-view class="auth-back" bindtap="backHome">返回首页</cover-view>
+  </cover-view>
+</view>

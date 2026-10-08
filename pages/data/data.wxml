@@ -1,0 +1,165 @@
+<!-- pages/data/data.wxml —— 运动数据统计 -->
+<view class="data-page" style="padding-top:{{statusBarH}}px">
+  <!-- 页首：标题 + 当前月份（右侧预留胶囊宽度） -->
+  <view class="head">
+    <view class="head-left">
+      <view class="ph">运动数据</view>
+      <view class="psub hint">坚持每一次跳动</view>
+    </view>
+    <view class="head-right" style="padding-right:{{capsuleRpx}}rpx">
+      <text class="month-tag">{{monthTag}}</text>
+    </view>
+  </view>
+
+  <!-- 登录门控提示条：未建立档案时只展示今日。
+       规则必须对用户明示（「暂存 7 天」是承诺，也是删除的依据），不做隐藏式门槛。 -->
+  <view wx:if="{{!isLogin}}" class="card gate-bar">
+    <view class="gate-top">
+      <view class="gate-chip"><ui-icon name="lock" size="30" color="#FF4E2A" /></view>
+      <text class="gate-t">未建立档案，仅显示今日</text>
+    </view>
+    <view class="gate-s">最近 {{bufferDays}} 天记录已暂存在本机；建立档案后可查看完整历史、趋势与挑战进度。</view>
+    <view class="btn btn-solid gate-btn" bindtap="goProfile" hover-class="btn-hover">建立档案</view>
+  </view>
+
+  <!-- 运动切换：跳绳 / 垫排球（各自独立统计） -->
+  <view class="segwrap">
+    <view class="seg">
+      <view
+        wx:for="{{sports}}"
+        wx:key="key"
+        class="seg-item {{sport === item.key ? 'on' : ''}}"
+        data-key="{{item.key}}"
+        bindtap="switchSport"
+        hover-class="seg-item-hover"
+      >{{item.name}}</view>
+    </view>
+  </view>
+
+  <!-- 日 / 周 / 月 切换 -->
+  <view class="segwrap">
+    <view class="seg sq">
+      <view
+        wx:for="{{ranges}}"
+        wx:key="key"
+        class="seg-item {{range === item.key ? 'on' : ''}}"
+        data-key="{{item.key}}"
+        bindtap="switchRange"
+        hover-class="seg-item-hover"
+      >{{item.name}}</view>
+    </view>
+  </view>
+
+  <!-- 主指标卡：周期累计 + 环比 + 三项统计。
+       右上角「分享」= 把当前这张卡（运动 × 周期 × 数字）画成图分享出去。
+       口径：所见即所分享 —— 卡片内容按当前可见数据生成，未登录时就是今日的数。 -->
+  <view class="card cardwrap">
+    <view class="metric-head">
+      <text class="hint metric-label">{{metricLabel}}</text>
+      <view class="share-btn" bindtap="openShare" hover-class="share-btn-hover" hover-stay-time="80">
+        <ui-icon name="share" size="26" color="#FF4E2A" />
+        <text class="share-btn-t">分享</text>
+      </view>
+    </view>
+    <view class="metric-main">
+      <text class="num metric-num">{{count}}</text>
+      <text class="muted metric-unit">个</text>
+    </view>
+    <view class="delta-pill" wx:if="{{deltaText}}">
+      <text class="delta-text {{deltaUp ? 'up' : ''}}">{{deltaText}}</text>
+    </view>
+    <view class="stat-row">
+      <view class="stat-col">
+        <view class="num stat-v">{{durationStr}}</view>
+        <view class="hint stat-l">训练时长</view>
+      </view>
+      <view class="stat-col">
+        <view class="num stat-v">{{sessions}}</view>
+        <view class="hint stat-l">训练次数</view>
+      </view>
+      <view class="stat-col">
+        <view class="num stat-v">{{streakDays}}</view>
+        <view class="hint stat-l">连续天数</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 趋势卡：柱状图 + 均值虚线。未登录时锁定 —— 趋势是时间纵深，不是「当日数据」。 -->
+  <view class="card cardwrap chart-card">
+    <view class="chart-head">
+      <text class="sec">{{trendTitle}}</text>
+      <text class="hint chart-note" wx:if="{{isLogin && hasData}}">虚线 = 均值 {{mean}}</text>
+    </view>
+
+    <block wx:if="{{isLogin}}">
+      <view class="chart" wx:if="{{hasData}}">
+        <view class="avgline" style="bottom:{{avgBottomRpx}}rpx"></view>
+        <view class="bars">
+          <view
+            class="col {{index === hiIndex ? 'hi' : ''}}"
+            wx:for="{{trend}}"
+            wx:key="label"
+          >
+            <view class="bar-fill" style="height:{{item.height}}%"></view>
+          </view>
+        </view>
+        <view class="xlabels">
+          <text
+            class="xl {{index === hiIndex ? 'hi' : ''}}"
+            wx:for="{{trend}}"
+            wx:key="label"
+          >{{item.label}}</text>
+        </view>
+      </view>
+
+      <view wx:else class="chart-empty">{{emptyText}}</view>
+    </block>
+
+    <view wx:else class="chart-lock">
+      <view class="chart-lock-chip"><ui-icon name="lock" size="40" color="#C4C8CC" /></view>
+      <view class="chart-lock-t">趋势需要完整训练档案</view>
+      <view class="chart-lock-s">建立档案后可查看近 7 天 / 6 周 / 6 月的变化</view>
+    </view>
+  </view>
+
+  <!-- 逐次明细入口：由「我的」页移入（2026-09-16）。
+       逐次记录属「过去发生了什么」，归数据页职责；「我的」页只留身份与账号操作。
+       未建立档案时整条入口不出现（明细就是时间纵深本身，无处可截）。 -->
+  <view wx:if="{{isLogin}}" class="card cardwrap records-entry">
+    <view class="rowlink" bindtap="goTraining" hover-class="rowlink-hover">
+      <view class="re-chip"><ui-icon name="clipboard" size="30" color="#6B7280" /></view>
+      <view class="re-body">
+        <text class="sec">训练记录</text>
+        <text class="hint re-sub">逐次明细 · 含每组用时与个数</text>
+      </view>
+      <text class="re-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 分享预览面板：先让用户看到卡片长什么样，再决定保存或分享。
+       预览用的就是最终要分享的那张图（同一个 canvas 产物），所以「所见即所分享」是结构性保证。 -->
+  <view wx:if="{{shareOpen}}" class="overlay share-overlay" bindtap="closeShare">
+    <view class="sheet share-sheet" catchtap="noop">
+      <view class="sheet-handle"></view>
+
+      <view class="share-preview">
+        <image wx:if="{{shareCardPath}}" class="share-img" src="{{shareCardPath}}" mode="widthFix" />
+        <view wx:else class="share-img-ph">
+          <text class="share-img-ph-t">正在生成卡片…</text>
+        </view>
+      </view>
+
+      <view class="share-tip">{{metricLabel}} · {{count}} 个</view>
+
+      <view class="share-acts">
+        <view class="btn share-ghost" bindtap="saveShareCard" hover-class="btn-hover">保存到相册</view>
+        <button class="btn btn-solid share-main" bindtap="shareByImage" hover-class="btn-hover">分享</button>
+      </view>
+
+      <view class="sheet-cancel" bindtap="closeShare">取消</view>
+    </view>
+  </view>
+
+  <!-- 分享卡片绘制用的离屏 canvas（位置固定在屏幕外，无需 class） -->
+  <canvas type="2d" id="shareCanvas" style="position:fixed;left:-9999px;top:-9999px;width:319px;height:226px;"></canvas>
+</view>

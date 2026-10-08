@@ -1,0 +1,45 @@
+<!-- pages/member/member.wxml —— 会员权益 -->
+<view class="member-page">
+  <!-- 会员等级头（自带状态栏留白） -->
+  <view class="m-hero" style="padding-top:{{statusBarH + 2}}px">
+    <view class="back-row" bindtap="navBack" hover-class="back-hover">
+      <text class="back-glyph">‹</text>
+      <text class="back-text">返回</text>
+    </view>
+    <view class="lv-pill">Lv{{tier.lv}} · {{tier.name}}</view>
+    <view class="m-total">累计训练 {{stats.count}} 个</view>
+    <view class="m-progress">
+      <view class="pbar m-bar">
+        <view class="pbar-fill" style="width:{{tier.progress}}%"></view>
+      </view>
+      <view class="m-progress-text">
+        <text wx:if="{{tier.remain > 0}}">距离「{{tier.nextName}}」还需 {{tier.remain}} 个</text>
+        <text wx:else>已达最高会员等级</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 权益网格 -->
+  <view class="sec-row">
+    <text class="sec">会员权益</text>
+    <text class="muted unlock-count">已解锁 <text class="brand-num">{{unlockedCount}}</text> / {{totalCount}}</text>
+  </view>
+
+  <view class="grid2 b-grid">
+    <view
+      wx:for="{{benefits}}"
+      wx:key="id"
+      class="b-card {{item.unlocked ? 'on' : ''}}"
+    >
+      <view class="b-chip {{item.unlocked ? '' : 'off'}}">
+        <ui-icon name="{{item.icon}}" size="34" color="{{item.unlocked ? '#FF4E2A' : '#9AA0A6'}}" />
+      </view>
+      <view class="b-name">{{item.name}}</view>
+      <view class="b-desc">{{item.desc}}</view>
+      <view wx:if="{{!item.unlocked}}" class="b-lock">Lv{{item.reqLv}} 解锁</view>
+    </view>
+  </view>
+
+  <view class="m-tip">会员等级随累计训练成长，无需付费。</view>
+  <view class="m-tip">训练越多，权益越多。</view>
+</view>

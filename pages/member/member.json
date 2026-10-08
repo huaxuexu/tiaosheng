@@ -1,0 +1,8 @@
+{
+  "navigationStyle": "custom",
+  "backgroundColor": "#EBEDEE",
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "ui-icon": "/components/icon/icon"
+  }
+}

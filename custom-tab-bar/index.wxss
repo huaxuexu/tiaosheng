@@ -1,0 +1,35 @@
+/* custom-tab-bar/index.wxss —— 对齐原型 .tabbar
+   原型：高 78px（含 18px 底部安全位）、1px 顶边线、无阴影、无顶部指示条；
+   图标 17px、文字 10.5px、间距 5px；选中态 = 品牌色文字 + 品牌色图标。
+   注：自定义 tabBar 与页面树的关系不确定，这里用字面色值而非 CSS 变量，避免令牌解析不到。 */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 120rpx;
+  background: #ffffff;
+  border-top: 2rpx solid #F0F0F0;
+  display: flex;
+  padding-bottom: env(safe-area-inset-bottom);
+  box-sizing: content-box;
+  z-index: 9999;
+}
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10rpx;
+}
+.tab-text {
+  font-size: 21rpx;
+  line-height: 1;
+  color: #9AA0A6;
+  transition: color 0.15s;
+}
+.tab-item.on .tab-text {
+  color: #FF4E2A;
+  font-weight: 600;
+}

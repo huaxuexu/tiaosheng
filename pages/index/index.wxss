@@ -1,0 +1,594 @@
+/* pages/index/index.wxss —— 跳绳计数：运动风界面 */
+.container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  overflow: hidden;
+}
+.gl {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* 对焦触控层：覆盖取景区域，拦截手动对焦点击（webgl canvas 会吞掉父级 bindtap） */
+.focus-layer {
+  position: absolute;
+  left: 10%;
+  top: 5%;
+  width: 80%;
+  height: 70%;
+  z-index: 85;
+  background: transparent;
+}
+
+/* 四周边框角标：橙色 L 型取景框（用两根纯色矩形条拼成，不依赖 cover-view 不支持的 border 单边） */
+.corner {
+  position: absolute;
+  width: 64rpx;
+  height: 64rpx;
+  z-index: 80;
+}
+.corner .bar {
+  position: absolute;
+  background: #ff8c00;
+}
+.corner .bar-h {
+  width: 64rpx;
+  height: 10rpx;
+}
+.corner .bar-v {
+  width: 10rpx;
+  height: 64rpx;
+}
+/* 四角取景框位置：整体下移，避免被顶部 HUD 胶囊遮挡（原 top 5%/bottom 25% → 13%/17%） */
+.corner-tl { left: 10%; top: 13%; }
+.corner-tl .bar-h { left: 0; top: 0; }
+.corner-tl .bar-v { left: 0; top: 0; }
+.corner-tr { right: 10%; top: 13%; }
+.corner-tr .bar-h { right: 0; top: 0; }
+.corner-tr .bar-v { right: 0; top: 0; }
+.corner-bl { left: 10%; bottom: 17%; }
+.corner-bl .bar-h { left: 0; bottom: 0; }
+.corner-bl .bar-v { left: 0; bottom: 0; }
+.corner-br { right: 10%; bottom: 17%; }
+.corner-br .bar-h { right: 0; bottom: 0; }
+.corner-br .bar-v { right: 0; bottom: 0; }
+/* 出框时角标变红，提示用户站入 */
+.corner.out .bar { background: #ff3b30; }
+
+/* 训练中顶部信息行：用时(左) | 计数(右)，分列两侧、深色胶囊 */
+.hud-top-row {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24rpx 32rpx;
+  box-sizing: border-box;
+  z-index: 100;
+}
+/* 深色圆角胶囊底：半透明黑 + 白字（参考图样式） */
+.hud-pill {
+  background: rgba(0, 0, 0, 0.55);
+  border-radius: 20rpx;
+  padding: 10rpx 28rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+.hud-pill-left { min-width: 180rpx; }
+.hud-pill-right { min-width: 120rpx; }
+/* 计数“暴击”：数字放大回弹 + 胶囊底色轻微发亮。
+   cover-view 自基础库 2.1.0 起支持 scale/rotate + transition，1.6.0 起支持 transform/opacity 过渡；
+   这里用 keyframes 播放一次，最稳。 */
+.hud-pill.count-beat {
+  animation: countBeat 0.22s ease-out;
+}
+@keyframes countBeat {
+  0%   { transform: scale(1);    background: rgba(0, 0, 0, 0.55); }
+  40%  { transform: scale(1.30); background: rgba(255, 140, 0, 0.92); }
+  100% { transform: scale(1);    background: rgba(0, 0, 0, 0.55); }
+}
+.hud-elapsed-val {
+  color: #fff;
+  font-size: 76rpx;
+  font-weight: bold;
+  line-height: 100rpx;
+  text-align: center;
+}
+.hud-count-val {
+  color: #fff;
+  font-size: 76rpx;
+  font-weight: bold;
+  line-height: 100rpx;
+  text-align: center;
+}
+
+/* 分组模式：中间胶囊。工作组显示「第 k / N 组」，休息段变绿底显示休息倒计时。
+   绿底（#1D9E75 系）是全局语义色 --ok，和深灰的用时/计数胶囊区分开，
+   让「现在该休息」一眼可辨。
+
+   内边距 32rpx / 4rpx 是量出来的，不是随手写：顶行是 align-items:flex-start，
+   左右胶囊的大字行盒是 100rpx（居中），中间是「56rpx 大字 + 28rpx 小字」两行。
+   取上内边距 32rpx → 中间大字行盒落在与左右大字相同的垂直区间，三者的**中心线
+   完全重合**（实测差 0px），小字「组」自然下挂在同一胶囊里；
+   上下内边距 32+4=36rpx，加上两行 84rpx 正好 120rpx = 与左右胶囊等高。
+   若写成上下均等的 18rpx，内容虽居中但大字会比左右「浮高」7px；写成 8rpx 则浮高 12px。 */
+.hud-pill-mid {
+  flex-direction: column;
+  min-width: 150rpx;
+  padding: 32rpx 24rpx 4rpx;
+}
+.hud-pill-mid.rest {
+  background: rgba(29, 158, 117, 0.88);
+}
+.hud-group-val {
+  color: #fff;
+  font-size: 46rpx;
+  font-weight: bold;
+  line-height: 56rpx;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.hud-group-cap {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 21rpx;
+  line-height: 28rpx;
+  text-align: center;
+}
+
+/* 底部状态提示 */
+.status-hint {
+  position: absolute;
+  left: 0;
+  bottom: 420rpx;
+  width: 100%;
+  text-align: center;
+  z-index: 100;
+}
+.status-dot {
+  display: inline-block;
+  width: 18rpx;
+  height: 18rpx;
+  border-radius: 50%;
+  background: #00ffcc;
+  vertical-align: middle;
+  margin-right: 12rpx;
+  transition: background 0.1s;
+}
+.status-dot.up {
+  background: #ffcc00;
+}
+.status-text {
+  display: inline-block;
+  vertical-align: middle;
+  color: #fff;
+  font-size: 26rpx;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 8rpx 20rpx;
+  border-radius: 20rpx;
+}
+
+/* 底部操作按钮：暂停/继续 + 停止（圆形 + 文字标签） */
+.action-bar {
+  position: absolute;
+  left: 0;
+  bottom: 120rpx;
+  width: 100%;
+  text-align: center;
+  z-index: 100;
+}
+.act-item {
+  display: inline-block;
+  margin: 0 50rpx;
+  text-align: center;
+  vertical-align: top;
+}
+/* 圆形按钮：cover-view 不支持渐变，必须用纯色 background */
+.circle {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  text-align: center;
+  margin: 0 auto;
+}
+.circle-pause {
+  background: #ff8c00;
+}
+.circle-stop {
+  background: #ff4500;
+}
+/* 自由分组「结束本组」按钮 */
+.circle-end {
+  background: #2ecc71;
+}
+.end-check {
+  color: #fff;
+  font-size: 72rpx;
+  line-height: 140rpx;
+  font-weight: bold;
+}
+/* 按钮下方文字标签 */
+.act-label {
+  display: block;
+  margin-top: 16rpx;
+  color: #fff;
+  font-size: 28rpx;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 0 2rpx 6rpx rgba(0, 0, 0, 0.5);
+}
+
+/* 暂停图标：两个竖条（纯色矩形，cover-view 可靠） */
+.pause-bar {
+  display: inline-block;
+  width: 14rpx;
+  height: 54rpx;
+  margin-top: 43rpx;
+  background: #fff;
+  border-radius: 4rpx;
+}
+.pause-bar-right {
+  margin-left: 16rpx;
+}
+/* 继续图标：三角文字字形（cover-view 不支持 border 三角，用字形最稳，且下方有"继续"文字兜底） */
+.play-glyph {
+  display: inline-block;
+  color: #fff;
+  font-size: 64rpx;
+  line-height: 140rpx;
+}
+/* 停止图标：圆角方块（纯色矩形） */
+.stop-square {
+  display: inline-block;
+  width: 50rpx;
+  height: 50rpx;
+  margin-top: 45rpx;
+  background: #fff;
+  border-radius: 10rpx;
+}
+
+/* 小工具栏：调试 + 重置（右上角） */
+.tool-bar {
+  position: absolute;
+  right: 30rpx;
+  top: 180rpx;
+  z-index: 100;
+}
+.tool-btn {
+  display: block;
+  width: auto;
+  padding: 0 16rpx;
+  height: 48rpx;
+  line-height: 48rpx;
+  margin-bottom: 16rpx;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+  font-size: 22rpx;
+  text-align: center;
+  border-radius: 24rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.25);
+}
+
+  /* 出框提示：覆盖层居中（用全宽容器 + text-align 居中，避免 cover-view 不支持 transform） */
+.frame-hint-wrap {
+  position: absolute;
+  left: 0;
+  top: 46%;
+  width: 100%;
+  text-align: center;
+  z-index: 110;
+}
+.frame-hint {
+  display: inline-block;
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffcc00;
+  font-size: 32rpx;
+  font-weight: bold;
+  padding: 20rpx 40rpx;
+  border-radius: 16rpx;
+  white-space: nowrap;
+}
+
+/* 调试关节点：标出索引 */
+.dbg-pt {
+  position: absolute;
+  width: 36rpx;
+  height: 36rpx;
+  line-height: 36rpx;
+  text-align: center;
+  margin-left: -18rpx;
+  margin-top: -18rpx;
+  background: rgba(0, 255, 204, 0.9);
+  color: #003;
+  font-size: 22rpx;
+  font-weight: bold;
+  border-radius: 50%;
+  z-index: 90;
+}
+
+/* 路线A：按部位着色（肩蓝/髋红/膝黄/踝绿/腕紫/肘橙，其余青） */
+.dbg-sh    { background: rgba(60, 140, 255, 0.95); color: #fff; }
+.dbg-hip   { background: rgba(255, 70, 70, 0.95);  color: #fff; }
+.dbg-knee  { background: rgba(255, 210, 40, 0.95);  color: #330; }
+.dbg-ankle { background: rgba(40, 220, 90, 0.95);   color: #023; }
+.dbg-wrist { background: rgba(190, 90, 255, 0.95);  color: #fff; }
+.dbg-elbow { background: rgba(255, 150, 40, 0.95);  color: #330; }
+.dbg-nose  { background: rgba(255, 255, 255, 0.95); color: #000; }
+.dbg-other { background: rgba(150, 150, 150, 0.75); color: #fff; }
+
+/* 调试诊断面板：左上方半透明块，浮于 canvas 之上 */
+.diag-panel {
+  position: absolute;
+  left: 20rpx;
+  top: 230rpx;
+  width: 460rpx;
+  background: rgba(0, 0, 0, 0.62);
+  border: 1rpx solid rgba(0, 255, 204, 0.4);
+  border-radius: 16rpx;
+  padding: 16rpx 18rpx;
+  z-index: 120;
+}
+.diag-title {
+  color: #00ffcc;
+  font-size: 26rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+}
+.diag-row {
+  color: #fff;
+  font-size: 22rpx;
+  line-height: 34rpx;
+}
+.diag-tip {
+  color: #ffcc00;
+  font-size: 20rpx;
+  margin: 6rpx 0;
+}
+.sens-row {
+  display: flex;
+  margin-top: 8rpx;
+}
+.sens-btn {
+  flex: 1;
+  text-align: center;
+  color: #fff;
+  font-size: 24rpx;
+  font-weight: bold;
+  line-height: 52rpx;
+  margin: 0 6rpx;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 10rpx;
+}
+.sens-btn.on {
+  background: #ff8c00;
+}
+
+/* 准备倒计时覆盖层（定时/定数训练前 10 秒） */
+.prep-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  z-index: 130;
+  background: rgba(0, 0, 0, 0.35);
+}
+.prep-num {
+  margin-top: 38%;
+  color: #ff8c00;
+  font-size: 240rpx;
+  font-weight: bold;
+  line-height: 1;
+  text-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.5);
+}
+/* 倒计时数字弹跳：每变一个数字播一次。
+   与 HUD 计数“暴击”同一套 cover-view keyframes 方案（基础库 2.1.0+ 支持 scale）。 */
+.prep-num.prep-beat {
+  animation: prepBeat 0.32s cubic-bezier(0.22, 1.2, 0.36, 1);
+}
+@keyframes prepBeat {
+  0%   { transform: scale(0.72); color: #ffd08a; }
+  45%  { transform: scale(1.18); color: #ffffff; }
+  100% { transform: scale(1);    color: #ff8c00; }
+}
+.prep-text {
+  margin-top: 20rpx;
+  color: #fff;
+  font-size: 56rpx;
+  font-weight: bold;
+  letter-spacing: 8rpx;
+}
+
+/* 结果摘要覆盖层 */
+.result-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 140;
+}
+.result-card {
+  width: 76%;
+  background: #1f1f1f;
+  border: 2rpx solid #ff8c00;
+  border-radius: 28rpx;
+  padding: 50rpx 40rpx;
+  box-sizing: border-box;
+}
+.result-title {
+  color: #ff8c00;
+  font-size: 48rpx;
+  font-weight: bold;
+  margin-bottom: 36rpx;
+}
+.result-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24rpx 10rpx;
+  border-bottom: 1rpx solid #333;
+}
+.result-k {
+  color: #bbb;
+  font-size: 32rpx;
+}
+.result-v {
+  color: #fff;
+  font-size: 52rpx;
+  font-weight: bold;
+}
+.result-btns {
+  display: flex;
+  justify-content: center;
+  margin-top: 44rpx;
+  gap: 24rpx;
+}
+.result-btn {
+  width: 260rpx;
+  background: #ff8c00;
+  color: #1a1a1a;
+  font-size: 34rpx;
+  font-weight: bold;
+  padding: 28rpx 0;
+  border-radius: 50rpx;
+  text-align: center;
+}
+.result-btn-ghost {
+  background: transparent;
+  color: #ff8c00;
+  border: 2rpx solid #ff8c00;
+}
+
+/* 分享栏 */
+.share-bar {
+  margin-top: 30rpx;
+  padding-top: 30rpx;
+}
+.share-divider {
+  width: 80rpx;
+  height: 3rpx;
+  background: linear-gradient(90deg, transparent, #ff8c00, transparent);
+  border-radius: 2rpx;
+  margin: 0 auto 28rpx;
+  opacity: 0.6;
+}
+.share-title {
+  color: #bbb;
+  font-size: 28rpx;
+  text-align: center;
+  margin-bottom: 24rpx;
+}
+.share-btns {
+  display: flex;
+  justify-content: center;
+  gap: 20rpx;
+}
+.share-btn {
+  flex: 1;
+  background: #2b2b2b;
+  border: 1rpx solid #3d3d3d;
+  border-radius: 18rpx;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  overflow: hidden;
+}
+.share-btn::after {
+  border: none;
+}
+.s-btn-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28rpx 12rpx;
+}
+.s-btn-label {
+  color: #ddd;
+  font-size: 28rpx;
+  font-weight: 500;
+}
+
+/* 摄像头权限引导层（盖在 canvas 之上，z-index 最高） */
+.auth-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.88);
+  text-align: center;
+  z-index: 200;
+}
+.auth-icon {
+  margin: 34% auto 0;
+  width: 140rpx;
+  height: 140rpx;
+  line-height: 140rpx;
+  border-radius: 50%;
+  background: rgba(255, 140, 0, 0.18);
+  border: 3rpx solid #ff8c00;
+  color: #ff8c00;
+  font-size: 56rpx;
+  font-weight: bold;
+}
+.auth-title {
+  margin-top: 36rpx;
+  color: #fff;
+  font-size: 44rpx;
+  font-weight: bold;
+}
+.auth-desc {
+  margin: 22rpx 80rpx 0;
+  color: #bbb;
+  font-size: 28rpx;
+  line-height: 44rpx;
+}
+.auth-btn {
+  display: inline-block;
+  margin-top: 60rpx;
+  background: #ff8c00;
+  color: #1a1a1a;
+  font-size: 34rpx;
+  font-weight: bold;
+  padding: 28rpx 80rpx;
+  border-radius: 50rpx;
+  letter-spacing: 2rpx;
+}
+.auth-back {
+  display: block;
+  margin: 36rpx auto 0;
+  color: #ff8c00;
+  font-size: 28rpx;
+}
+
+/* 对焦反馈环：点击取景框任意位置触发，缩放消失动画 */
+.focus-ring {
+  position: absolute;
+  width: 80rpx;
+  height: 80rpx;
+  margin-left: -40rpx;
+  margin-top: -40rpx;
+  border: 3rpx solid #ff8c00;
+  border-radius: 50%;
+  z-index: 150;
+  animation: focusPulse 0.8s ease-out forwards;
+}
+@keyframes focusPulse {
+  0%   { transform: scale(0.4); opacity: 1; }
+  60%  { transform: scale(1.0); opacity: 0.7; }
+  100% { transform: scale(1.2); opacity: 0; }
+}

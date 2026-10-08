@@ -1,0 +1,102 @@
+<!-- pages/home/home.wxml —— 首页
+     结构与样式对齐 docs/档C全应用视觉系统_可交互原型.html 的 pgHome()。
+     换算规则：原型按 375px 宽出图，小程序 750rpx，故原型 px 值 ×2 = rpx。 -->
+<view class="home" style="padding-top:{{statusBarH}}px">
+
+  <!-- 主标题（自定义导航下代替导航栏标题） -->
+  <view class="hero">
+    <view class="hero-title">会有时<text class="hero-em">计数器</text></view>
+    <view class="hero-sub">长风破浪会有时，直挂云帆济沧海。</view>
+  </view>
+
+  <!-- 运动项目卡（写实照片） -->
+  <view class="sportrow">
+    <view
+      class="sportcard {{selectedSport === item.key ? 'on' : ''}}"
+      wx:for="{{sports}}"
+      wx:key="key"
+      data-key="{{item.key}}"
+      bindtap="selectSport"
+      hover-class="sportcard-hover"
+    >
+      <image class="sc-img" src="{{item.img}}" mode="aspectFill" />
+      <view class="sc-scrim"></view>
+      <text class="sc-name">{{item.name}}</text>
+    </view>
+  </view>
+
+  <!-- 主训练卡片 -->
+  <view class="main-card">
+
+    <!-- 模式：定时 / 定数 / 自由 -->
+    <view class="seg">
+      <view
+        class="seg-item {{selectedMode === item.key ? 'on' : ''}}"
+        wx:for="{{modes}}"
+        wx:key="key"
+        data-key="{{item.key}}"
+        bindtap="selectMode"
+      >{{item.name}}</view>
+    </view>
+
+    <!-- 参数行 -->
+    <view class="value-row {{selectedMode === 'free' ? 'free' : ''}}">
+      <block wx:if="{{selectedMode === 'timed'}}">
+        <view class="rbtn" bindtap="minusTime" hover-class="rbtn-hover">−</view>
+        <view class="big-value">{{timeStr}}</view>
+        <view class="rbtn" bindtap="addTime" hover-class="rbtn-hover">+</view>
+      </block>
+      <block wx:elif="{{selectedMode === 'counted'}}">
+        <view class="rbtn" bindtap="minusCount" hover-class="rbtn-hover">−</view>
+        <view class="big-value">{{targetCount}}<text class="unit">个</text></view>
+        <view class="rbtn" bindtap="addCount" hover-class="rbtn-hover">+</view>
+      </block>
+      <block wx:else>
+        <view class="free-text">自由训练</view>
+      </block>
+    </view>
+
+    <!-- 分组训练 / 休息：作为当前模式的开关，开启后参数随模式变化 -->
+    <view class="group-box">
+      <view class="group-head" bindtap="toggleGroup" hover-class="group-head-hover">
+        <text class="group-title">分组训练 / 休息</text>
+        <view class="switch {{groupOn ? 'on' : ''}}"><view class="knob"></view></view>
+      </view>
+      <block wx:if="{{groupOn}}">
+        <view class="gparam">
+          <text class="gk">组数</text>
+          <view class="gops">
+            <view class="gsbtn" data-k="sets" data-v="-1" bindtap="onGroupAdj" hover-class="gsbtn-hover">−</view>
+            <text class="gv">{{groupSets}}</text>
+            <view class="gsbtn" data-k="sets" data-v="1" bindtap="onGroupAdj" hover-class="gsbtn-hover">+</view>
+          </view>
+        </view>
+        <view class="gparam" wx:if="{{selectedMode !== 'free'}}">
+          <text class="gk">{{selectedMode === 'counted' ? '每组个数' : '每组时长'}}</text>
+          <view class="gops">
+            <view class="gsbtn" data-k="work" data-v="{{-(selectedMode === 'counted' ? 10 : 15)}}" bindtap="onGroupAdj" hover-class="gsbtn-hover">−</view>
+            <text class="gv">{{selectedMode === 'counted' ? groupWork : groupWorkStr}}{{selectedMode === 'counted' ? ' 个' : ''}}</text>
+            <view class="gsbtn" data-k="work" data-v="{{selectedMode === 'counted' ? 10 : 15}}" bindtap="onGroupAdj" hover-class="gsbtn-hover">+</view>
+          </view>
+        </view>
+        <view class="gparam">
+          <text class="gk">组间休息</text>
+          <view class="gops">
+            <view class="gsbtn" data-k="rest" data-v="-15" bindtap="onGroupAdj" hover-class="gsbtn-hover">−</view>
+            <text class="gv">{{groupRestStr}}</text>
+            <view class="gsbtn" data-k="rest" data-v="15" bindtap="onGroupAdj" hover-class="gsbtn-hover">+</view>
+          </view>
+        </view>
+      </block>
+    </view>
+
+    <view class="start-wrap">
+      <view class="start-circle" bindtap="start" hover-class="start-circle-hover">
+        <view class="play-glyph"></view>
+        <text class="start-text">开始训练</text>
+      </view>
+    </view>
+
+  </view>
+
+</view>
