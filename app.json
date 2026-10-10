@@ -10,7 +10,6 @@
     "pages/member/member",
     "pages/agreement/agreement"
   ],
-  "workers": "workers",
   "window": {
     "navigationBarTitleText": "会有时计数器",
     "navigationBarBackgroundColor": "#ffffff",
